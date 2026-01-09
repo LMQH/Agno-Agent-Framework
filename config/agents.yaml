@@ -1,0 +1,23 @@
+# Agent Configurations
+# ⚠️ 注意：此文件当前未使用
+# - 当前项目的 Agents 直接在代码中定义（src/agents/）
+# - 此配置文件保留以备后续扩展使用
+# - 如需启用 YAML 配置加载，请参考 src/utils/yaml_agent_loader.py
+# - 并在 src/agentos/__init__.py 中恢复相关加载逻辑
+agents:
+  db_agent:
+    name: "DB Agent"
+    model: "deepseek-v3.2-exp"
+    instructions: |
+      你是一个数据库查询助手。
+      当启用时，应调用数据库工具进行数据库信息查询，返回查询到的结果。
+    tools: ["database_tools"]
+    add_history_to_context: true
+    enable_agentic_memory: true
+    use_database: true
+
+# Agent Settings
+settings:
+  default_model: "deepseek-v3.2-exp"
+  enable_tracing: true
+  enable_debug: false

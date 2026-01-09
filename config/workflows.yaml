@@ -1,0 +1,25 @@
+# Workflow Configurations
+# ⚠️ 注意：此文件当前未使用
+# - 当前项目的 Workflows 直接在代码中定义（src/workflows/）
+# - 此配置文件保留以备后续扩展使用
+# - 如需启用 YAML 配置加载，需要实现相应的 YAML loader
+workflows:
+  data_processing_workflow:
+    name: "Data Processing Workflow"
+    description: "处理数据查询和分析的工作流"
+    steps:
+      - name: "validate_request"
+        description: "验证请求参数"
+      - name: "query_database"
+        description: "执行数据库查询"
+      - name: "process_results"
+        description: "处理查询结果"
+      - name: "return_response"
+        description: "返回处理结果"
+
+# Workflow Settings
+settings:
+  enable_persistence: true # 是否启用持久化
+  max_execution_time: 300  # 最大执行时间
+  retry_on_failure: true # 是否启用失败重试
+  max_retries: 3 # 最大重试次数

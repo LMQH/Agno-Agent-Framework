@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agno-multi-agent-framework"
+version = "0.1.0"
+description = "Multi Agent Framework based on Agno"
+authors = [
+    {name = "AI Assistant", email = "assistant@example.com"}
+]
+dependencies = [
+    "agno",
+    "fastapi",
+    "uvicorn",
+    "python-dotenv",
+    "pydantic",
+    "sqlalchemy",
+    "pymysql",
+    "asyncmy",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[project.scripts]
+start = "main:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true

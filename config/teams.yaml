@@ -1,0 +1,16 @@
+# Team Configurations
+# ⚠️ 注意：此文件当前未使用
+# - 当前项目的 Teams 直接在代码中定义
+# - 此配置文件保留以备后续扩展使用
+# - 如需启用 YAML 配置加载，需要实现相应的 YAML loader
+teams:
+  backend_team:
+    name: "Backend Team"
+    members: ["db_agent"]
+    instructions: "协作处理任务，查询数据库并返回结果"
+    enable_coordination: true
+
+# Team Settings
+settings:
+  enable_parallel_execution: true
+  max_concurrent_tasks: 5
