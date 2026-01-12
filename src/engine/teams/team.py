@@ -57,6 +57,7 @@ class DiscussionTeam:
         
         self.team = Team(
             name=self.team_name,
+            id="discussion_team",
             model=chat_model,
             members=[self.pro_agent, self.con_agent, self.leader_agent],
             instructions=[
@@ -211,3 +212,20 @@ def create_discussion_team(
         team_name=team_name
     )
 
+
+def create_discussion_team_for_agentos(team_name: str = "Discussion Team") -> Team:
+    """
+    创建讨论团队的 Team 对象（用于注册到 AgentOS）
+    
+    此函数复用 create_discussion_team 的内部实现，返回 Team 对象而不是 DiscussionTeam 包装类。
+    这样可以在 AgentOS 控制面板上显示和使用讨论团队。
+    
+    Args:
+        team_name: 团队名称
+    
+    Returns:
+        Team: Team 对象实例，可用于注册到 AgentOS
+    """
+    # 复用 create_discussion_team 创建 DiscussionTeam，然后返回其内部的 Team 对象
+    discussion_team = create_discussion_team(team_name=team_name)
+    return discussion_team.team

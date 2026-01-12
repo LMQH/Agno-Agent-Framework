@@ -6,7 +6,7 @@ Teams Module
 from .pro_agent import create_pro_agent
 from .con_agent import create_con_agent
 from .leader_agent import create_leader_agent
-from .team import DiscussionTeam, create_discussion_team
+from .team import DiscussionTeam, create_discussion_team, create_discussion_team_for_agentos
 
 __all__ = [
     'create_pro_agent',
@@ -14,4 +14,5 @@ __all__ = [
     'create_leader_agent',
     'DiscussionTeam',
     'create_discussion_team',
+    'create_discussion_team_for_agentos',
 ]
