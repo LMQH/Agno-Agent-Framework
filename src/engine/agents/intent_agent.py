@@ -34,12 +34,15 @@ def create_intent_agent() -> Agent:
     输出要求（必须严格按照以下JSON格式输出）：
     {
         "enable_db_agent": true/false,  // 是否启用数据库查询智能体（如果用户问题涉及数据库查询，设为true）
+        "enable_discussion_team": true/false,  // 是否启用讨论团队（如果用户问题需要深入讨论、观点分析、多角度思考等，设为true）
         "intent_summary": "对用户意图的简单判断和描述"  // 一段简洁的文字，说明用户的意图和需求
     }
     
     判断规则：
     - 如果用户的问题涉及数据库查询、数据检索、数据统计等，enable_db_agent 应设为 true
     - 如果用户的问题只是普通对话、不需要查询数据库，enable_db_agent 应设为 false
+    - 如果用户的问题需要深入讨论、观点分析、多角度思考、决策建议、复杂问题分析等，enable_discussion_team 应设为 true
+    - 如果用户的问题只是简单查询、事实性回答等，enable_discussion_team 应设为 false
     - output_agent 始终都要启用，这个不需要在输出中体现（由系统自动处理）
     
     示例：
@@ -47,6 +50,7 @@ def create_intent_agent() -> Agent:
     输出：
     {
         "enable_db_agent": true,
+        "enable_discussion_team": false,
         "intent_summary": "用户需要查询数据库中的用户表信息，需要启用数据库查询功能"
     }
     
@@ -54,7 +58,24 @@ def create_intent_agent() -> Agent:
     输出：
     {
         "enable_db_agent": false,
-        "intent_summary": "用户进行普通对话，询问天气情况，不需要数据库查询"
+        "enable_discussion_team": false,
+        "intent_summary": "用户进行普通对话，询问天气情况，不需要数据库查询和讨论"
+    }
+    
+    用户问题："如何看待人工智能的发展？"
+    输出：
+    {
+        "enable_db_agent": false,
+        "enable_discussion_team": true,
+        "intent_summary": "用户需要深入讨论人工智能发展问题，需要启用讨论团队进行多角度分析"
+    }
+    
+    用户问题："分析一下远程办公的优缺点"
+    输出：
+    {
+        "enable_db_agent": false,
+        "enable_discussion_team": true,
+        "intent_summary": "用户需要多角度分析远程办公问题，需要启用讨论团队"
     }
     
     请严格按照JSON格式输出，不要添加任何其他文字说明。""",

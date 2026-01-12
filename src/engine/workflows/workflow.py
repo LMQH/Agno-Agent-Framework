@@ -10,6 +10,7 @@ from agno.workflow.step import Step
 from src.engine.agents.intent_agent import create_intent_agent
 from src.engine.agents.db_agent import create_db_agent
 from src.engine.agents.output_agent import create_output_agent
+from src.engine.teams.team import create_discussion_team
 from src.database.connection import get_workflow_database
 
 logger = logging.getLogger(__name__)
@@ -82,12 +83,14 @@ async def main_workflow_steps(*args, **kwargs):
             intent_data = json.loads(intent_content)
         
         enable_db_agent = intent_data.get("enable_db_agent", False)
+        enable_discussion_team = intent_data.get("enable_discussion_team", False)
         intent_summary = intent_data.get("intent_summary", "未识别到明确意图")
         
-        logger.info(f"意图识别结果: enable_db_agent={enable_db_agent}, intent_summary={intent_summary}")
+        logger.info(f"意图识别结果: enable_db_agent={enable_db_agent}, enable_discussion_team={enable_discussion_team}, intent_summary={intent_summary}")
     except (json.JSONDecodeError, KeyError) as e:
-        logger.warning(f"解析意图识别结果失败: {e}，默认启用数据库查询")
-        enable_db_agent = True  # 默认启用，确保功能可用
+        logger.warning(f"解析意图识别结果失败: {e}，使用默认值")
+        enable_db_agent = False
+        enable_discussion_team = False
         intent_summary = intent_content  # 使用原始内容作为摘要
     
     # 步骤2：数据库查询（如果启用）
@@ -111,7 +114,48 @@ async def main_workflow_steps(*args, **kwargs):
     else:
         logger.info("跳过数据库查询步骤")
     
-    # 步骤3：整合输出
+    # 步骤3：讨论团队（如果启用）
+    discussion_result_content = None
+    discussion_evaluation_info = None
+    if enable_discussion_team:
+        logger.info("开始讨论团队讨论...")
+        try:
+            # 创建讨论团队
+            discussion_team = create_discussion_team()
+            
+            # 构建讨论上下文（包含数据查询结果）
+            discussion_context = None
+            if enable_db_agent and db_result_content:
+                discussion_context = f"数据查询结果：\n{db_result_content}"
+            
+            # 执行讨论
+            discussion_result = await discussion_team.run(
+                user_query=user_input,
+                context=discussion_context
+            )
+            
+            discussion_result_content = discussion_result.get("discussion_result", "")
+            
+            # 构建评估信息
+            eval_result = discussion_result.get("evaluation_result")
+            final_score = discussion_result.get("final_score")
+            total_rounds = discussion_result.get("total_rounds", 0)
+            reached_threshold = discussion_result.get("reached_threshold", False)
+            
+            if final_score is not None:
+                discussion_evaluation_info = f"讨论评估分数: {final_score}/10, 讨论轮次: {total_rounds}, 达到阈值: {reached_threshold}"
+            else:
+                discussion_evaluation_info = f"讨论轮次: {total_rounds}, 达到阈值: {reached_threshold}"
+            
+            logger.info(f"讨论团队讨论完成: {discussion_evaluation_info}")
+        except Exception as e:
+            logger.error(f"讨论团队讨论失败: {e}", exc_info=True)
+            discussion_result_content = f"讨论团队讨论过程中出现错误: {str(e)}"
+            discussion_evaluation_info = "讨论评估失败"
+    else:
+        logger.info("跳过讨论团队步骤")
+    
+    # 步骤4：整合输出
     logger.info("开始整合输出...")
     
     # 构建整合输出的输入
@@ -124,6 +168,13 @@ async def main_workflow_steps(*args, **kwargs):
         output_parts.append(f"数据库查询结果：\n{db_result_content}")
     else:
         output_parts.append("未执行数据库查询")
+    
+    if enable_discussion_team and discussion_result_content:
+        output_parts.append(f"讨论团队讨论结果：\n{discussion_result_content}")
+        if discussion_evaluation_info:
+            output_parts.append(f"讨论评估信息：{discussion_evaluation_info}")
+    else:
+        output_parts.append("未执行讨论团队讨论")
     
     output_input = "\n\n".join(output_parts)
     output_input += "\n\n请基于以上信息，生成一个完整、清晰、友好的回复给用户。"
@@ -145,7 +196,7 @@ def create_main_workflow() -> Workflow:
     """
     workflow = Workflow(
         name="Main Workflow",
-        description="主工作流：意图识别 -> 数据库查询（可选）-> 整合输出",
+        description="主工作流：意图识别 -> 数据库查询（可选）-> 讨论团队（可选）-> 整合输出",
         steps=[
             Step(name="main_workflow", executor=main_workflow_steps),
         ],

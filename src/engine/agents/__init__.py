@@ -6,10 +6,12 @@ Agents Module
 from .db_agent import create_db_agent
 from .intent_agent import create_intent_agent
 from .output_agent import create_output_agent
+from .judge_agent import create_discussion_judge
 
 __all__ = [
     'create_db_agent',
     'create_intent_agent',
     'create_output_agent',
+    'create_discussion_judge',
 ]
 

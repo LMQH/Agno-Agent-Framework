@@ -32,7 +32,30 @@ fi
 # 检查 Python 环境
 if ! command -v python3 &> /dev/null; then
     echo "错误: 未找到 python3 命令"
+    echo ""
+    echo "建议先运行环境配置脚本："
+    echo "  ./bin/setup_conda_env.sh"
+    echo ""
+    echo "或者手动激活 conda 环境："
+    echo "  conda activate agno_multi_agent_play"
     exit 1
+fi
+
+# 检查 conda 环境
+if [[ "$CONDA_DEFAULT_ENV" != "agno_multi_agent_play" ]]; then
+    echo "警告: 未检测到正确的 conda 环境"
+    echo ""
+    echo "建议激活项目环境："
+    echo "  conda activate agno_multi_agent_play"
+    echo ""
+    echo "或者运行完整环境配置："
+    echo "  ./bin/setup_conda_env.sh"
+    echo ""
+    read -p "是否继续？(y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
 fi
 
 # 检查虚拟环境（如果存在）

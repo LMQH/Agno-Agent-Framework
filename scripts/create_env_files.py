@@ -2,6 +2,8 @@
 """
 创建环境配置文件脚本
 从 env.template 创建 .env.dev, .env.show, .env.prod 文件
+
+Python 版本要求: Python 3.12+
 """
 
 import shutil

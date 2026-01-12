@@ -21,6 +21,16 @@ def create_agentos(base_app=None, **kwargs) -> AgentOS:
     # 设置默认值
     kwargs.setdefault('teams', [])
     
+    # 如果没有提供 tracing_db，使用 Agno 专用数据库（用于追踪和知识库存储）
+    if 'tracing_db' not in kwargs:
+        from src.database.connection import get_agent_database
+        kwargs['tracing_db'] = get_agent_database()
+        logger.info("已配置 AgentOS 追踪数据库（用于追踪和知识库存储）")
+    
+    # 确保自动配置数据库（AgentOS 会自动从环境变量读取数据库配置）
+    if 'auto_provision_dbs' not in kwargs:
+        kwargs['auto_provision_dbs'] = True
+    
     # 如果没有提供 agents，默认添加所有智能体
     if 'agents' not in kwargs or not kwargs['agents']:
         from src.engine.agents import (

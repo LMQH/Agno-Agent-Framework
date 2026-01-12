@@ -18,6 +18,8 @@ class MilvusConnection:
         self._client = None
         self._connected = False
         self._database = None
+        self._should_create_default_collection = False
+        self._default_collection_name = "agno_knowledge_default"
 
     def _create_connection(self):
         """
@@ -77,6 +79,13 @@ class MilvusConnection:
             self._database = database
             
             logger.debug(f"成功连接到 Milvus: {host}:{port}, 数据库: {database}")
+            
+            # 确保默认集合存在（延迟导入避免循环依赖）
+            # 注意：这里延迟创建集合，避免在连接阶段触发循环依赖
+            # 集合会在首次使用 query_tools 时自动创建
+            self._should_create_default_collection = True
+            self._default_collection_name = os.getenv("MILVUS_DEFAULT_COLLECTION", "agno_knowledge_default")
+            
             return True
 
         except Exception as e:
